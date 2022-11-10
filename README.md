@@ -22,3 +22,6 @@ But at each update, the website authorized 5 pages. That means, we can't extract
 To solve this challenge, we used "SELENIUM" and a nice team spirit to improve the code.
 We first add lines to click on the button until the button deseappears.
 The "REQUESTS" updates the page, so all the HTML code was lost. Then, we added lines to extract the HTML code before this update.
+
+#Instruction
+To use the scrapper, you just have to execute the file scrapper_rt.py. It will ask you to enter the number of pages to scrape.
