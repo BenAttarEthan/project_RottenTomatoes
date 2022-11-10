@@ -19,4 +19,6 @@ For each movie, we exeplored the related link to take a maximum of informations 
 The main challenge we faced is on the main page. Rotten Tomatoes provides a big amount of movies. That means a big amount of pages.
 The pages are scrolled behind each others, and to open a new one, it needed to 'click' on a "LOAD MORE" button.
 But at each update, the website authorized 5 pages. That means, we can't extract the list of the films on the other pages, even if we loaded it before.
-Unfortunately, we did not solved the problem yet.
+To solve this challenge, we used "SELENIUM" and a nice team spirit to improve the code.
+We first add lines to click on the button until the button deseappears.
+The "REQUESTS" updates the page, so all the HTML code was lost. Then, we added lines to extract the HTML code before this update.
