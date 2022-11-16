@@ -1,13 +1,17 @@
 # project_RottenTomatoes ITC DS OCT 2022
+*******************************************
 
-#Members
+## Members
+-----------------
 Ethan BEN ATTAR
 Meïr AMAR
 
-#Introduction
+## Introduction
+-----------------
 For this project, we decide to scrap all the movies avaible on streaming platforms rated on the website https://www.rottentomatoes.com/browse/movies_at_home/
 
-#Milestone 1
+## Milestone 1
+-----------------
 We create a webscraper using the packages "REQUESTS", "BS4" and "SELENIUM".
 
 "REQUESTS" was used to validate that the datas are avaible.
@@ -23,5 +27,7 @@ To solve this challenge, we used "SELENIUM" and a nice team spirit to improve th
 We first add lines to click on the button until the button deseappears.
 The "REQUESTS" updates the page, so all the HTML code was lost. Then, we added lines to extract the HTML code before this update.
 
-#Instruction
-To use the scrapper, you just have to execute the file scrapper_rt.py. It will ask you to enter the number of pages to scrape.
+## Instruction
+-----------------
+To use the scrapper, first open a command line terminal. Once this is done go in the folder containing the project.
+Then, to execute it, ```$ py ./scrapper_rt.py [NUMBER_OF_PAGES]``` with [NUMBER_OF_PAGES] being replaced by the number of pages to scrappe.
