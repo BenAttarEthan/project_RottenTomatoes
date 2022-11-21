@@ -1,0 +1,38 @@
+table movies {
+  id int [pk]
+  title varchar
+  tomatometer int
+  year datetime
+  language varchar
+  rating varchar
+  distributor_id int [ref: < distributor.id]
+}
+
+table movie_staff {
+  id int [pk]
+  full_name varchar
+  job varchar
+}
+
+table staff_of_movie {
+  id int [pk]
+  movie_id int [ref: < movies.id]
+  staff_id int [ref: < movie_staff.id]
+}
+
+table genres {
+  id int [pk]
+  type varchar 
+} 
+
+table genre_of_movie {
+  id int [pk]
+  movie_id int [ref: < movies.id]
+  genre_id int [ref: < genres.id]
+}
+
+
+table distributor {
+  id int [pk]
+  name varchar
+}
