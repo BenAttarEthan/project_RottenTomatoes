@@ -18,6 +18,7 @@ def send_thread_request(urls):
     for response in responses:
         movie_info = get_movie_info(response.text)
         print(movie_info)
+        print("\n")
 
 
 def get_movies_url(text):
