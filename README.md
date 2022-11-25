@@ -31,4 +31,4 @@ The "REQUESTS" updates the page, so all the HTML code was lost. Then, we added l
 ## Instruction
 -----------------
 To use the scrapper, first open a command line terminal. Once this is done go in the folder containing the project.
-Then, to execute it, tap ```$ py ./scrapper_rt.py [NUMBER_OF_PAGES]``` as a command line, with [NUMBER_OF_PAGES] being replaced by the number of pages to scrappe.
+Then, to execute it, tap ```$ py ./scrapper_rt.py [NUMBER_OF_PAGES] {home,theater} [genres]``` as a command line, with [NUMBER_OF_PAGES] being replaced by the number of pages to scrape, ```{home,theater}``` representing if you are interested in movies that are currently in theaters or if you are more interested in movies you can see at home and finally ```[genres]``` that represents the genres of the movies you want to scrape. You can pass as arguments as much genres you want. If you need more information to understand how to use the program you can try ```$ py ./scrapper_rt.py -h```. It will also provide you te list of genres available.
