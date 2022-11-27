@@ -5,13 +5,15 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
 from webdriver_manager.chrome import ChromeDriverManager
-import requests
 import argparse
 import selenium.common.exceptions
 import json
+import logging
+from fill_rt_project import application
 
 
 def open_json(filename):
+    """ Searches the file passed in argument and make sure it opens correctly and return his content as a dict"""
     try:
         with open(filename, 'r') as json_file:
             return json.load(json_file)
@@ -25,6 +27,7 @@ JSON_CONFIG = open_json('conf.json')
 
 
 def send_thread_request(urls, datas):
+    """ Sends requests of urls in variable urls using grequests and write all the datas recovered in a csv file """
     my_requests = (grequests.get(url) for url in urls)
     responses = grequests.map(my_requests)
     writer = csv.DictWriter(datas, fieldnames=JSON_CONFIG['columns'])
@@ -34,12 +37,18 @@ def send_thread_request(urls, datas):
 
 
 def get_movies_url(text):
+    """
+    Get the url from all movies in the html page passed in the text argument
+    """
     soup = BeautifulSoup(text)
     main_movies = soup.find_all('a', {'class': 'js-tile-link', 'href': True})
     return main_movies
 
 
 def get_movie_info(text):
+    """
+    Finds all the infos about a movie on its url page
+    """
     movie_soup = BeautifulSoup(text)
     movie_info = {'Title': movie_soup.find('score-board').find('h1').string,
                   'Tomatometer': movie_soup.find('score-board').get('tomatometerscore')}
@@ -85,7 +94,6 @@ def get_all_movies_info(text, datas):
                 packed_urls = []
         if len(packed_urls) != 0:
             send_thread_request(packed_urls, datas)
-        exit()
     except ValueError as err:
         print(err)
 
@@ -110,11 +118,15 @@ def get_page(page_number, url, datas):
             break
     text = wd.page_source
     get_all_movies_info(text, datas)
+    application()
     wd.close()
     exit()
 
 
 def main():
+    """
+    Allows the all script to be launched throught the command line with different possible arguments
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument('Number_of_pages', type=int)
     parser.add_argument('where', choices=['home', 'theater'])
