@@ -26,14 +26,27 @@ def open_json(filename):
 JSON_CONFIG = open_json('conf.json')
 
 
+def scrape_api(titles):
+    movies_requests = (grequests.get(JSON_CONFIG['api_base_url'] + title) for title in titles)
+    responses = grequests.map(movies_requests)
+    return [response.json().get('Metascore', 'N/A') for response in responses]
+
+
 def send_thread_request(urls, datas):
     """ Sends requests of urls in variable urls using grequests and write all the datas recovered in a csv file """
     my_requests = (grequests.get(url) for url in urls)
     responses = grequests.map(my_requests)
     writer = csv.DictWriter(datas, fieldnames=JSON_CONFIG['columns'])
+    movies_info = []
+    titles = []
     for response in responses:
         movie_info = get_movie_info(response.text)
-        writer.writerow(movie_info)
+        titles.append(movie_info['Title'])
+        movies_info.append(movie_info)
+    metascores = scrape_api(titles)
+    for i in range(len(metascores)):
+        movies_info[i]['Metascore'] = metascores[i]
+        writer.writerow(movies_info[i])
 
 
 def get_movies_url(text):
@@ -53,6 +66,7 @@ def get_movie_info(text):
     movie_info = {'Title': movie_soup.find('score-board').find('h1').string,
                   'Tomatometer': movie_soup.find('score-board').get('tomatometerscore')}
     print(f'Retrieving datas of {movie_info["Title"]}')
+    movie_info['Metascore'] = scrape_api(movie_info['Title'])
     movie_infos = movie_soup.find('ul', {'class': 'content-meta info'}).find_all('li')
     for content in movie_infos:
         if content.find('time') is not None:
@@ -118,7 +132,7 @@ def get_page(page_number, url, datas):
             break
     text = wd.page_source
     get_all_movies_info(text, datas)
-    application()
+    # application()
     wd.close()
     exit()
 
