@@ -575,6 +575,3 @@ def application():
     db_staff_of_movie(nb_rows)
     print(query_db("SELECT * FROM movies"))
 
-
-if __name__ == '__main__':
-    application()
