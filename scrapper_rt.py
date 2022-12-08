@@ -9,8 +9,7 @@ import argparse
 import selenium.common.exceptions
 import json
 import logging
-from fill_rt_project import application
-
+import fill_rt_project
 
 logging.basicConfig(filename='project.log',
                     format='%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNC:%(funcName)s-LINE:%(lineno)d-%(message)s',
@@ -141,9 +140,9 @@ def get_page(page_number, url, datas):
     text = wd.page_source
     get_all_movies_info(text, datas)
     logging.info('Every wanted movies were added to the csv file.')
-    application()
-    logging.info('The database has been created with all the movies from the csv file.')
     wd.close()
+    fill_rt_project.application()
+    logging.info('The database has been created with all the movies from the csv file.')
     exit()
 
 
