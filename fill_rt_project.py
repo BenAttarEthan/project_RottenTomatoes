@@ -28,7 +28,7 @@ JSON_CONFIG = open_json('conf.json')
 
 
 def data_distributor(nb_rows):
-    """Record the distributors"""
+    """Record the distributors of movies"""
     distributor = []
     dd = []
     with open("data_scrapped.csv", "r", encoding='utf8') as my_file:
@@ -48,7 +48,7 @@ def data_distributor(nb_rows):
 
 
 def my_date(d):
-    """Dates corrections and verifications"""
+    """Check if the date d if correct otherwise it changes it to the right format"""
     date_dict = JSON_CONFIG['date_dict']
     try:
         dd = int(d[-4:])
@@ -65,6 +65,7 @@ def my_date(d):
 
 
 def int_note(value):
+    """ Check if value is an int otherwise return -1. It allows us to check if the movie has a grade or not"""
     try:
         res = int(value)
         logging.info('variables format OK in data_movies()')
@@ -99,7 +100,7 @@ def data_movies(nb_rows, max_id):
 
 
 def data_cast(nb_rows):
-    """Record the cast"""
+    """Record the cast of the movie"""
     actor = {}
     actors = []
     cast_id = 1
@@ -146,21 +147,21 @@ def data_genre(nb_rows):
         logging.info('reader OK in data_genre()')
         movie_id = 1
         for j in reader:
-            ggenre = j['Genre:']  # MANY
+            ggenre = j['Genre:']
             my_genre = ggenre.split(', ')
             for g in my_genre:
                 my_gg = g.strip()
-                if my_gg not in my_g:  # add genre id
-                    genre.append((genre_id, my_gg))  # TAB GENRES
+                if my_gg not in my_g:
+                    genre.append((genre_id, my_gg))
                     my_g.append(my_gg)
                     genress[my_gg] = genre_id
-                    genre_of_movie.append((gom_id, movie_id, genress[my_gg]))  # TAB GENRE OF MOVIE ID M_ID GENRE
+                    genre_of_movie.append((gom_id, movie_id, genress[my_gg]))
                     genre_id += 1
                     gom_id += 1
                     logging.info('new genre added OK in data_genre()')
                 else:
                     genress[g] = genress[my_gg]
-                    genre_of_movie.append((gom_id, movie_id, genress[my_gg]))  # TAB GENRE OF MOVIE ID M_ID GENRE
+                    genre_of_movie.append((gom_id, movie_id, genress[my_gg]))
                     gom_id += 1
                     logging.info('existed genre added to genre of movies OK in data_genre()')
             movie_id += 1
@@ -180,19 +181,19 @@ def data_movie_staff(nb_rows):
         logging.info('reader OK in data_movie_staff()')
         movie_id = 1
         for j in reader:
-            ddirector = j['Director:']  # MANY
-            pproducer = j['Producer:']  # MANY
-            wwriter = j['Writer:']  # MANY
+            ddirector = j['Director:']
+            pproducer = j['Producer:']
+            wwriter = j['Writer:']
             my_dir = ddirector.split(', ')
             my_prod = pproducer.split(', ')
             my_wr = wwriter.split(', ')
             for dir in my_dir:
                 if dir not in movie_staff:
-                    movies_staff[dir] = ms_id  # TAB MOVIE STAFF: ID NAME
-                    movie_staff.append((ms_id, dir))  # TAB MOVIE STAFF: ID NAME
+                    movies_staff[dir] = ms_id
+                    movie_staff.append((ms_id, dir))
                     ms_id += 1
                     staff.append(
-                        (staff_id, movie_id, movies_staff[dir], 'Director'))  # TAB STAFF OF MOVIE: ID M_ID S_ID Job
+                        (staff_id, movie_id, movies_staff[dir], 'Director'))
                     staff_id += 1
                     logging.info('new director added OK in data_movie_staff()')
             for prod in my_prod:
@@ -216,6 +217,7 @@ def data_movie_staff(nb_rows):
 
 
 def data(nb_rows, max_id):
+    """ Call the differents functions that convert the csv file to different infos variables about the movie."""
     distributor = data_distributor(nb_rows)
     logging.info('data_distributor called successfully')
     data = data_movies(nb_rows, max_id)
@@ -239,16 +241,23 @@ def data(nb_rows, max_id):
 # TAB MOVIE STAFF: ID NAME
 # TAB STAFF OF MOVIE: ID M_ID S_ID Job
 
-print('********************************************************************************************')
-print('********************************************************************************************')
-print('****                                                                                    ****')
-print('****                                 DATA ANALYZED                                      ****')
-print('****                                                                                    ****')
-print('********************************************************************************************')
-print('********************************************************************************************')
+def aesthetic_print():
+    """
+    Print a fancy logo for the command line
+    """
+    print('********************************************************************************************')
+    print('********************************************************************************************')
+    print('****                                                                                    ****')
+    print('****                                 DATA ANALYZED                                      ****')
+    print('****                                                                                    ****')
+    print('********************************************************************************************')
+    print('********************************************************************************************')
 
 
 def creation_db():
+    """
+    Create the database
+    """
     connection = pymysql.connect(host='localhost',
                                  user='root',
                                  password='root',
@@ -262,7 +271,9 @@ def creation_db():
 
 
 def connect_db():
-    """Connect to db"""
+    """
+    Connect to db
+    """
     connection = pymysql.connect(host='localhost',
                                  user='root',
                                  password='root',
@@ -273,7 +284,9 @@ def connect_db():
 
 
 def query_db1(my_query):
-    """ Define query function"""
+    """
+    Allow to query the database with my_query
+    """
     connection = connect_db()
     with connection:
         with connection.cursor() as my_cursor:
@@ -286,7 +299,9 @@ def query_db1(my_query):
 
 
 def query_db(my_query, data):
-    """ Define query function"""
+    """
+    Allow to query the database multiple times
+    """
     connection = connect_db()
     with connection:
         with connection.cursor() as my_cursor:
@@ -300,6 +315,9 @@ def query_db(my_query, data):
 
 
 def exist():
+    """
+    Find and return the maximum id if it exists and return 0 otherwise
+    """
     a = query_db1(JSON_CONFIG['QEXIST'])
     max_id = query_db1(JSON_CONFIG['QMAXEXIST'])[0][0]
     if max_id is None:
@@ -313,6 +331,9 @@ def exist():
 
 
 def clean_empty():
+    """
+    Delete all wrong lines with missing values
+    """
     query_db1(JSON_CONFIG['QEMOVIES'])
     query_db1(JSON_CONFIG['QEDISTRIBUTORS'])
     query_db1(JSON_CONFIG['QEACTORS'])
@@ -324,6 +345,9 @@ def clean_empty():
 
 
 def my_movies():
+    """
+    Create the table movies in the database
+    """
     try:
         query_db1(JSON_CONFIG['QMYMOVIES'])
         logging.info('movies table created')
@@ -350,7 +374,6 @@ def db_movies(nb_rows):
     cpt = 0
     while cpt <= nb_rows - 1:
         if movie_info[cpt][1] not in list_m:
-            # Fill movies
             try:
                 query_db(JSON_CONFIG['QDBMOVIES'], movie_info[cpt])
                 logging.info('movies added successfully')
@@ -361,6 +384,9 @@ def db_movies(nb_rows):
 
 
 def my_actors():
+    """
+    Create table actors in the database if it doesn't exist
+    """
     try:
         query_db1(JSON_CONFIG['QMYACTOR'])
         logging.info('actors table added successfully')
@@ -370,7 +396,9 @@ def my_actors():
 
 
 def db_actors(nb_rows):
-    """ACTORS"""
+    """
+    Insert the datas about actors into the table actors
+    """
     my_actors()
     e = exist()
     max_id = e[1]
@@ -379,7 +407,6 @@ def db_actors(nb_rows):
     cpt_id = 1
     actors = datas[2]
     while cpt <= len(actors)-1:
-        # Fill actors
         try:
             query_db(JSON_CONFIG['QDBACTORS'], actors[cpt])
             logging.info('actors added successfully')
@@ -391,6 +418,9 @@ def db_actors(nb_rows):
 
 
 def my_distributors():
+    """
+    Create the table distributors if it doesn't exist
+    """
     try:
         query_db1(JSON_CONFIG['QMYDISTRIBUTORS'])
         logging.info('my_distributor table added successfully')
@@ -400,7 +430,9 @@ def my_distributors():
 
 
 def db_distributors(nb_rows):
-    """DISTRIBUTORS"""
+    """
+    Insert the datas about distributors into the table distributors
+    """
     my_distributors()
     e = exist()
     a = e[0]
@@ -410,7 +442,6 @@ def db_distributors(nb_rows):
     cpt_id = 1
     distributors = datas[1]
     while cpt <= len(distributors)-1:
-        # Fill distributors
         try:
             query_db(JSON_CONFIG['QDBDISYTIBUTORS'], distributors[cpt])
             logging.info('distributor added successfully')
@@ -422,6 +453,9 @@ def db_distributors(nb_rows):
 
 
 def my_cast():
+    """
+    Create the table cast if it doesn't exist
+    """
     try:
         query_db1(JSON_CONFIG['QMYCAST'])
         logging.info('my_cast table added successfully')
@@ -431,7 +465,9 @@ def my_cast():
 
 
 def db_cast(nb_rows):
-    """CAST"""
+    """
+    Insert the datas about cast into the table cast
+    """
     my_cast()
     e = exist()
     max_id = e[1]
@@ -440,7 +476,6 @@ def db_cast(nb_rows):
     cpt_id = 1
     cast = datas[3]
     while cpt <= len(cast)-1:
-        # Fill distributors
         try:
             query_db(JSON_CONFIG['QDBCAST'], cast[cpt])
             logging.info('new cast added successfully')
@@ -452,6 +487,9 @@ def db_cast(nb_rows):
 
 
 def my_genre():
+    """
+    Create the table genre if it doesn't exist
+    """
     try:
         query_db1(JSON_CONFIG['QMYGENRE'])
         logging.info('genre table added successfully')
@@ -461,7 +499,9 @@ def my_genre():
 
 
 def db_genre(nb_rows):
-    """GENRES"""
+    """
+    Insert the datas about genre into the table genre
+    """
     my_genre()
     e = exist()
     max_id = e[1]
@@ -470,7 +510,6 @@ def db_genre(nb_rows):
     cpt_id = 1
     genres = datas[4]
     while cpt <= len(genres) - 1:
-        # Fill distributors
         try:
             query_db(JSON_CONFIG['QDGGENRE'], genres[cpt])
             logging.info('new genre added successfully')
@@ -482,6 +521,9 @@ def db_genre(nb_rows):
 
 
 def my_gom():
+    """
+    Create the table genre of movie if it doesn't exist
+    """
     try:
         query_db1(JSON_CONFIG['QMYGOM'])
         logging.info('my_gom table added successfully')
@@ -491,7 +533,9 @@ def my_gom():
 
 
 def db_gom(nb_rows):
-    """GENRE_OF_MOVIE"""
+    """
+    Insert the datas about genre of movies into the table genre_of_movie
+    """
     my_gom()
     e = exist()
     max_id = e[1]
@@ -500,7 +544,6 @@ def db_gom(nb_rows):
     cpt_id = 1
     gom = datas[5]
     while cpt <= len(gom) - 1:
-        # Fill distributors
         try:
             query_db(JSON_CONFIG['QDBGOM'], gom[cpt])
             logging.info('new genre of movie added successfully')
@@ -512,6 +555,9 @@ def db_gom(nb_rows):
 
 
 def my_staff():
+    """
+    Create the table staff if it doesn't exist
+    """
     try:
         query_db1(JSON_CONFIG['QMYSTAFF'])
         logging.info('my_staff table added successfully')
@@ -521,7 +567,9 @@ def my_staff():
 
 
 def db_staff(nb_rows):
-    """MOVIE STAFF"""
+    """
+    Insert the datas about staffs into the table staff
+    """
     my_staff()
     e = exist()
     max_id = e[1]
@@ -530,7 +578,6 @@ def db_staff(nb_rows):
     cpt_id = 1
     ms = datas[6]
     while cpt <= len(ms) - 1:
-        # Fill distributors
         try:
             query_db(JSON_CONFIG['QDBSTAFF'], ms[cpt])
             logging.info('new staff added successfully')
@@ -542,6 +589,9 @@ def db_staff(nb_rows):
 
 
 def my_sof():
+    """
+    Create the table staff_of_movie if it doesn't exist
+    """
     try:
         query_db1(JSON_CONFIG['QMYSOF'])
         logging.info('staff of movie table added successfully')
@@ -551,7 +601,9 @@ def my_sof():
 
 
 def db_staff_of_movie(nb_rows):
-    """STAFF OF MOVIE"""
+    """
+    Insert the datas about staff of movies into the table staff_of_movie
+    """
     my_sof()
     e = exist()
     max_id = e[1]
@@ -560,7 +612,6 @@ def db_staff_of_movie(nb_rows):
     cpt_id = 1
     ms = datas[7]
     while cpt <= len(ms) - 1:
-        # Fill distributors
         try:
             query_db(JSON_CONFIG['QDBSOF'], ms[cpt])
             logging.info('staff of movie added successfully')
@@ -572,6 +623,9 @@ def db_staff_of_movie(nb_rows):
 
 
 def create_db():
+    """
+    Create the database if it doesn't exist
+    """
     try:
         creation_db()
         print('CREATION DB')
@@ -582,7 +636,8 @@ def create_db():
 
 
 def application():
-    """APPLY"""
+    """Call all the functions that create and insert data in the database"""
+    aesthetic_print()
     nb_rows = len(pd.read_csv('data_scrapped.csv'))
     logging.info('nb_rows detected')
     create_db()
