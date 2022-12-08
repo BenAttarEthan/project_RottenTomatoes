@@ -12,6 +12,11 @@ import logging
 from fill_rt_project import application
 
 
+logging.basicConfig(filename='project.log',
+                    format='%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNC:%(funcName)s-LINE:%(lineno)d-%(message)s',
+                    level=logging.INFO)
+
+
 def open_json(filename):
     """ Searches the file passed in argument and make sure it opens correctly and return his content as a dict"""
     try:
@@ -29,7 +34,7 @@ JSON_CONFIG = open_json('conf.json')
 def scrape_api(titles):
     movies_requests = (grequests.get(JSON_CONFIG['api_base_url'] + title) for title in titles)
     responses = grequests.map(movies_requests)
-    return [response.json().get('Metascore', 'N/A') for response in responses]
+    return [response.json().get('Metascore', -1) for response in responses]
 
 
 def send_thread_request(urls, datas):
@@ -47,6 +52,7 @@ def send_thread_request(urls, datas):
     for i in range(len(metascores)):
         movies_info[i]['Metascore'] = metascores[i]
         writer.writerow(movies_info[i])
+    logging.info("Successfully wrote 5 more movies to the csv file.")
 
 
 def get_movies_url(text):
@@ -110,6 +116,7 @@ def get_all_movies_info(text, datas):
             send_thread_request(packed_urls, datas)
     except ValueError as err:
         print(err)
+        logging.error(f'An error occured: {err}')
 
 
 def get_page(page_number, url, datas):
@@ -129,10 +136,13 @@ def get_page(page_number, url, datas):
             time.sleep(JSON_CONFIG["sleep"])
         except selenium.common.exceptions.ElementNotInteractableException:
             print(f'You asked for {page_number} pages but there is {i + 1} pages.')
+            logging.error(f'You asked for {page_number} pages but there is {i + 1} pages.')
             break
     text = wd.page_source
     get_all_movies_info(text, datas)
-    # application()
+    logging.info('Every wanted movies were added to the csv file.')
+    application()
+    logging.info('The database has been created with all the movies from the csv file.')
     wd.close()
     exit()
 
