@@ -33,7 +33,7 @@ JSON_CONFIG = open_json('conf.json')
 def scrape_api(titles):
     movies_requests = (grequests.get(JSON_CONFIG['api_base_url'] + title) for title in titles)
     responses = grequests.map(movies_requests)
-    return [response.json().get('Metascore', -1) for response in responses]
+    return [response.json().get('Metascore', -1) if response.ok else -1 for response in responses]
 
 
 def send_thread_request(urls, datas):
@@ -105,7 +105,7 @@ def get_all_movies_info(text, datas):
     """
     packed_urls = []
     try:
-        movies = get_movies_url(text)
+        movies = list(set(get_movies_url(text)))
         # Let's go to the movie page to catch contents
         for movie_url in movies:
             packed_urls.append(JSON_CONFIG["base"] + movie_url['href'])
