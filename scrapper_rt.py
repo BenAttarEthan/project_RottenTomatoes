@@ -44,9 +44,10 @@ def send_thread_request(urls, datas):
     movies_info = []
     titles = []
     for response in responses:
-        movie_info = get_movie_info(response.text)
-        titles.append(movie_info['Title'])
-        movies_info.append(movie_info)
+        if response.ok:
+            movie_info = get_movie_info(response.text)
+            titles.append(movie_info['Title'])
+            movies_info.append(movie_info)
     metascores = scrape_api(titles)
     for i in range(len(metascores)):
         movies_info[i]['Metascore'] = metascores[i]
